@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Sample SAM Template for secdoc
+Globals:
+    Function:
+        Timeout: 3
+Resources:
+    HelloWorldFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            CodeUri: hello_world/
+            Handler: app.lambda_handler
+            Runtime: python3.9
+            Policies:
+              # - AWSLambdaDynamoDBExecutionRole
+              - AWSLambdaExecute
+              - Statement:
+                - Sid: AllowDynamodbReadWrite
+                  Effect: Allow
+                  Action:
+                    - dynamodb:PutItem
+                    - dynamodb:GetItem
+                    - dynamodb:UpdateItem
+                    - dynamodb:DeleteItem
+                    - dynamodb:*
+                  Resource: !GetAtt TeamsTable.Arn
+            Events:
+                HelloWorld:
+                    Type: Api
+                    Properties:
+                        Path: /hello
+                        Method: get
+                HelloWorldName:
+                    Type: Api
+                    Properties:
+                        Path: /hello/{name}
+                        Method: get
+                Teams:
+                    Type: Api
+                    Properties:
+                        Path: /teams
+                        Method: get
+                Team:
+                    Type: Api
+                    Properties:
+                        Path: /team/{team}
+                        Method: get
+    TeamsTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+          TableName: teams
+          AttributeDefinitions:
+            - AttributeName: name
+              AttributeType: S
+          KeySchema:
+            - AttributeName: name
+              KeyType: HASH
+          ProvisionedThroughput:
+            ReadCapacityUnits: 4
+            WriteCapacityUnits: 1
+
+Outputs:
+    HelloWorldApi:
+        Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+        Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/teams/"

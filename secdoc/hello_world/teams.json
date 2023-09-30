@@ -1,0 +1,16 @@
+[
+    {
+        "PutRequest": {
+            "Item": {
+                "name": {"S": "D&R"}
+            }
+        }
+    },
+    {
+        "PutRequest": {
+            "Item": {
+                "name": {"S": "TEST"}
+            }
+        }
+    }
+
